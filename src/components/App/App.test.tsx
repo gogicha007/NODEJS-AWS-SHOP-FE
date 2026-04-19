@@ -40,7 +40,10 @@ test("Renders products list", async () => {
     })
   );
   renderWithProviders(
-    <MemoryRouter initialEntries={["/"]}>
+    <MemoryRouter
+      initialEntries={["/"]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <App />
     </MemoryRouter>
   );
