@@ -8,7 +8,12 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "bootstrap": "cdk bootstrap aws://149614785775/eu-north-1 --profile vlab_dev",
+    "deploy": "npm --prefix .. run build && npm run build && cdk deploy InfraStack --require-approval never",
+    "deploy:vlab": "npm run deploy -- --profile vlab_dev",
+    "diff": "cdk diff InfraStack",
+    "synth": "cdk synth InfraStack"
   },
   "devDependencies": {
     "@types/jest": "^30",
