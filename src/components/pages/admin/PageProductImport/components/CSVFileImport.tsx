@@ -31,7 +31,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     const response = await axios({
       method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Basic ${token}`
       },
       url,
       params: {
