@@ -19,6 +19,8 @@ if (import.meta.env.DEV) {
   worker.start({ onUnhandledRequest: "bypass" });
 }
 
+localStorage.setItem("token", 'Z29naWNoYTAwNzpURVNUX1BBU1NXT1JE')
+
 const container = document.getElementById("app");
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = createRoot(container!);
