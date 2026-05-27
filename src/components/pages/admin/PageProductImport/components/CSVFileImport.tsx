@@ -24,7 +24,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     if (!file) return;
 
     console.log("uploadFile to", url);
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("authorization_token")
     console.log("token", token)
 
     // Get the presigned URL
