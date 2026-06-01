@@ -2,6 +2,7 @@ import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useMutation } from "react-query";
 
 type CSVFileImportProps = {
   url: string;
@@ -9,7 +10,38 @@ type CSVFileImportProps = {
 };
 
 export default function CSVFileImport({ url, title }: CSVFileImportProps) {
-  const [file, setFile] = React.useState<File | null>();
+  const [file, setFile] = React.useState<File | null>(null);
+
+  const { mutate: uploadFileMutation, isLoading } = useMutation({
+    mutationFn: async (fileToUpload: File) => {
+      const token = localStorage.getItem("authorization_token");
+
+      const response = await axios({
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${token}`,
+        },
+        url,
+        params: {
+          name: fileToUpload.name,
+        },
+        responseType: "text",
+      });
+
+      const result = await fetch(response.data, {
+        method: "PUT",
+        body: fileToUpload,
+      });
+
+      if (!result.ok) {
+        const error = new Error("S3 upload failed") as Error & {
+          status?: number;
+        };
+        error.status = result.status;
+        throw error;
+      }
+    },
+  });
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -20,30 +52,14 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     setFile(null);
   };
 
-  const uploadFile = async () => {
+  const uploadFile = () => {
     if (!file) return;
 
-    console.log("uploadFile to", url);
-
-    // Get the presigned URL
-    const response = await axios({
-      method: "GET",
-      url,
-      params: {
-        name: file.name,
+    uploadFileMutation(file, {
+      onSuccess: () => {
+        setFile(null);
       },
-      responseType: "text",
     });
-
-    console.log("File to upload: ", file.name);
-    console.log("Uploading to: ", response.data);
-
-    const result = await fetch(response.data, {
-      method: "PUT",
-      body: file,
-    });
-    console.log("Result: ", result);
-    setFile(null);
   };
   return (
     <Box>
@@ -54,8 +70,12 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
         <input type="file" onChange={onFileChange} />
       ) : (
         <div>
-          <button onClick={removeFile}>Remove file</button>
-          <button onClick={uploadFile}>Upload file</button>
+          <button onClick={removeFile} disabled={isLoading}>
+            Remove file
+          </button>
+          <button onClick={uploadFile} disabled={isLoading}>
+            {isLoading ? "Uploading..." : "Upload file"}
+          </button>
         </div>
       )}
     </Box>
